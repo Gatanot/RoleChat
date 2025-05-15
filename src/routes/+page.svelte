@@ -13,6 +13,7 @@
     // 从 $lib/components/DataPanel.svelte 导入数据面板组件 (用于AI设置)
     import DataPanel from "$lib/components/DataPanel.svelte";
     // 从 svelte/store 导入 get 函数，用于获取 store 的当前值
+    import FileLoader from "$lib/components/FileLoader.svelte";
     import { get } from "svelte/store";
     // 从 svelte 导入 onMount (生命周期函数) 和 tick (等待DOM更新)
     import { onMount, tick } from "svelte";
@@ -177,6 +178,33 @@
         document.body.removeChild(a); // 从文档中移除 <a> 标签
         URL.revokeObjectURL(url); // 释放之前创建的临时 URL
     }
+
+    // 新增：处理从 JsonFileUploader 组件传来的数据
+    async function handleJsonUploaded(event) {
+        const { systemPrompt, messages } = event.detail;
+
+        aiSettings.systemPrompt = systemPrompt;
+        // 如果您的 messageHistory store 是一个 Svelte writable store,可以直接 .set()
+        // 假设 messageHistory 是 writable
+        messageHistory.set(messages);
+
+        // 可选：给用户一些反馈
+        console.log("对话历史已成功从JSON文件加载。");
+        // 如果您有一个通知系统，可以在这里触发一个成功通知
+
+        // 滚动到聊天窗口底部，以显示加载的消息
+        await tick(); // 等待DOM更新
+        const messagesPanel = document.querySelector(
+            ".messages-panel .messages-list-wrapper",
+        ); // 更精确的选择器
+        if (messagesPanel) {
+            // 更好的滚动方式，尤其是在消息从底部开始排列的情况下
+            const parentContainer = messagesPanel.parentElement; // .messages-panel
+            if (parentContainer) {
+                parentContainer.scrollTop = parentContainer.scrollHeight;
+            }
+        }
+    }
 </script>
 
 <!-- 
@@ -189,6 +217,7 @@
     <header class="app-header" bind:this={chatAppHeaderRef}>
         <h1>历史可编辑对话</h1>
         <div class="header-actions">
+            <FileLoader on:jsonLoaded={handleJsonUploaded} />
             <!-- 下载对话历史按钮 -->
             <button on:click={downloadChatHistory} class="download-button">
                 下载对话
@@ -363,31 +392,23 @@
     /* ... (rest of the styles for buttons, data-panel-flyout, etc. remain unchanged) ... */
     .download-button {
         padding: 5px 12px;
-        background-color: transparent;
-        color: #555555;
-        border: 1px solid #dcdcdc;
+        background-color: #5a99e0;
+        color: white;
+        border: 1px solid #4a80c0;
         border-radius: 4px;
         font-size: 12px;
         font-weight: normal;
         cursor: pointer;
-        text-decoration: none;
-        transition:
-            background-color 0.15s ease-in-out,
-            border-color 0.15s ease-in-out,
-            color 0.15s ease-in-out;
+        transition: background-color 0.15s ease-in-out;
         line-height: 1.3;
     }
 
     .download-button:hover {
-        background-color: #f8f8f8;
-        border-color: #b0b0b0;
-        color: #333333;
+        background-color: #4a80c0;
     }
 
     .download-button:active {
-        background-color: #f0f0f0;
-        border-color: #a0a0a0;
-        color: #222222;
+        background-color: #3e6aa4;
     }
 
     .settings-toggle-button {

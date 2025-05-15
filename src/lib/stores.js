@@ -56,3 +56,9 @@ export function sliceMessage(index) {
     const currentId = get(idCounter);
     idCounter.update(currentID => currentID - 1)
 }
+export function loadMessage(messageData) {
+    const currentId = messageData.len() + 1;
+    // 使用 store 的 update 方法来更新数组
+    idCounter.update(currentId)
+    messageHistory.update(messageData);
+}
