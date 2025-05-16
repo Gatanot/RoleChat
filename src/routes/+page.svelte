@@ -2,6 +2,7 @@
     // 从 $lib/stores 导入用于添加消息、消息历史记录和更新消息的函数/存储
     import {
         addMessage,
+        idCounter,
         messageHistory,
         sliceMessage,
         updateMessage,
@@ -187,7 +188,7 @@
         // 如果您的 messageHistory store 是一个 Svelte writable store,可以直接 .set()
         // 假设 messageHistory 是 writable
         messageHistory.set(messages);
-
+        idCounter.set(messages.length);
         // 可选：给用户一些反馈
         console.log("对话历史已成功从JSON文件加载。");
         // 如果您有一个通知系统，可以在这里触发一个成功通知
@@ -234,7 +235,7 @@
         <div class="messages-list-wrapper">
             <!-- 遍历消息历史记录 ($messageHistory 是一个 Svelte store, $ 前缀表示自动订阅) -->
             <!-- message.id 作为 key 用于 Svelte 高效更新列表 -->
-            {#each $messageHistory as message (message.id)}
+            {#each $messageHistory as message}
                 <!-- 渲染单个聊天消息组件 -->
                 <ChatMessage {message}></ChatMessage>
             {/each}
