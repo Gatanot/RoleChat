@@ -2,7 +2,7 @@
 <script>
     import { createEventDispatcher } from "svelte"; // 导入事件分发器
     import { updateMessage } from "$lib/stores";
-
+    import { marked } from "marked";
     export let message;
 
     const dispatch = createEventDispatcher(); // 初始化分发器
@@ -172,10 +172,7 @@
                 </div>
             {:else}
                 <div class="message-text">
-                    {#each message.content.split("\n") as paragraph, i}
-                        <p>{paragraph || "\u00A0"}</p>
-                        <!-- {#if i < message.content.split("\n").length -1}<br />{/if} -->
-                    {/each}
+                    <div>{@html marked.parse(message.content)}</div>
                 </div>
             {/if}
         </div>
@@ -197,24 +194,24 @@
         justify-content: flex-end;
     }
     .user-message .message-bubble:not(.editing-active-bubble) {
-        background-color: #3498db;
-        color: white;
+        background-color: #e9edf0;
+        color: #34495e;
         border-bottom-right-radius: 6px;
     }
     .user-message .avatar-container {
-        background-color: #2980b9;
+        background-color: #7f8c8d;
     }
     .user-message .message-header strong {
-        color: rgba(255, 255, 255, 0.95);
+        color: #2c3e50;
     }
     .user-message .action-btn {
-        color: rgba(255, 255, 255, 0.8);
+        color: #566573;
     }
     .user-message .action-btn:hover:not(:disabled) {
-        color: white;
+        color: #2c3e50;
     }
     .user-message .action-btn:disabled {
-        color: rgba(255, 255, 255, 0.5);
+        color: rgba(86, 101, 115, 0.5);
         cursor: default;
     }
     .user-message .action-btn:disabled:hover {
@@ -340,14 +337,6 @@
         height: 17px;
     }
     /* Optional: specific class for refresh button if needed, e.g. .refresh-btn */
-
-    .message-text p {
-        margin: 0 0 0.15em 0;
-        white-space: pre-wrap; /* Preserves newlines and spaces */
-    }
-    .message-text p:last-child {
-        margin-bottom: 0;
-    }
 
     /* --- 编辑模式样式 --- */
     .is-editing-mode.user-message,
